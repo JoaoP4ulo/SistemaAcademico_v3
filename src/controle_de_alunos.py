@@ -20,11 +20,11 @@ def MenuAluno():
         comando = str(input("\nDigite sua opção:"))
 
         if comando == "1":
-            cadastrar_aluno(aluno_dao) 
+            cadastrar_aluno(aluno_dao) #feito
         elif comando == "2":
-            atualizar_aluno(aluno_dao) 
+            atualizar_aluno(aluno_dao) #feito
         elif comando == "3":
-            deletar_aluno(aluno_dao) 
+            deletar_aluno(aluno_dao) #feito
         elif comando == "4":
             listar_alunos(aluno_dao) 
         elif comando == "5":
@@ -97,33 +97,93 @@ def cadastrar_aluno(aluno_dao):
         
     cep = str(input("  Insira o CEP:"))
 
-    endereco_lista = []
-
     try:
         endereco = utils.conferir_cep(cep)
     except:
-        print("Não foi possível encontrar informações do CEP")
-        rua = str(input(" Logradouro (Rua): "))
-        bairro = str(input(" Bairro: "))
-        cidade = str(input(" Cidade: "))
-        estado = str(input(" Estado: "))
+        print("Não foi possível encontrar informações do CEP.")
+        endereco_lista = obter_endereco_manualmente()
+    else:
+        endereco_lista = endereco
 
-        endereco_lista.append(cep, rua, bairro, cidade, estado)
-
-        
-
-    aluno = Aluno(cpf, nome, idade, email, endereco)
+    aluno = Aluno(cpf, nome, idade, email, endereco_lista)
 
     aluno_dao.cadastrar_aluno(aluno)
 
     print('\n\n  Aluno cadastrado com sucesso!')
 
 
+def obter_endereco_manualmente():
+    rua = str(input(" Logradouro (Rua): "))
+    bairro = str(input(" Bairro: "))
+    cidade = str(input(" Cidade: "))
+    estado = str(input(" Estado: "))
+
+    return [rua, bairro, cidade, estado]
+
+
 def atualizar_aluno(aluno_dao):
-    pass
+    cpf = str(input("    CPF do aluno:"))
+    aluno_existente = aluno_dao.buscar_aluno(cpf)
+
+    if aluno_existente is None:
+        print('\n    Aluno não encontrado!')
+        cpf = str(input("    CPF do aluno:"))
+        aluno_existente = aluno_dao.buscar_aluno(cpf)
+        if aluno_existente is None:
+            print('\n    Aluno não encontrado!')
+            MenuAluno(aluno_dao.db_path)
+
+    print(f"""\n
+        Dados do Aluno:\n
+        CPF: {aluno_existente.cpf}
+        Nome: {aluno_existente.nome}
+        Idade: {aluno_existente.idade}
+        Email: {aluno_existente.email}
+        Endereço: {aluno_existente.endereco}\n
+    """)
+
+    nome_new = str(input("\n    Novo nome do aluno:"))
+    idade_new = str(input("\n    Nova idade do aluno:"))
+    email_new = str(input("\n    Novo email do aluno:"))
+
+    cep = str(input("\n    Novo CEP do aluno:"))
+    endereco_new = utils.conferir_cep(cep)
+
+    if nome_new:
+        aluno_existente.nome = nome_new
+
+    if idade_new:
+        try:
+            idade_new = int(idade_new)
+            aluno_existente.idade = idade_new
+        except ValueError:
+            print("A idade deve ser um número inteiro.")
+
+    if email_new:
+        aluno_existente.email = email_new
+
+    if endereco_new:
+        aluno_existente.endereco = endereco_new
+
+    aluno_dao.atualizar_aluno(aluno_existente)
+    print("Aluno atualizado com sucesso!")
+
 
 def deletar_aluno(aluno_dao):
-    pass
+    cpf = str(input("    CPF:"))
+    aluno_existente = aluno_dao.buscar_aluno(cpf)
+
+    if aluno_existente is None:
+        print('\n    Aluno não encontrado!')
+        cpf = str(input("    CPF:"))
+        aluno_existente = aluno_dao.buscar_aluno(cpf)
+        if aluno_existente is None:
+            print('\n    Aluno não encontrado!')
+            MenuAluno(aluno_dao.db_path)
+
+    resposta = str(input(f"Deseja excluir o aluno {aluno_existente.nome}? [y/n]"))
+    if resposta.lower() == 'y':
+        aluno_dao.excluir_aluno(aluno_existente)
 
 def listar_alunos(aluno_dao):
-    pass
+    aluno_dao.listar_alunos()

@@ -69,12 +69,31 @@ def conferir_cep(cep):
         response.raise_for_status()  # Verificar se houve algum erro na requisição
         endereco_info = response.json()
 
-        # Atualizar a lista de endereço com as informações disponíveis
-        endereco[0] = endereco_info.get('cep', 'CEP não encontrado')
-        endereco[1] = endereco_info.get('logradouro', 'Logradouro não encontrado')
-        endereco[2] = endereco_info.get('bairro', 'Bairro não encontrado')
-        endereco[3] = endereco_info.get('localidade', 'Cidade não encontrada')
-        endereco[4] = endereco_info.get('uf', 'Estado não encontrado')
+        # Verificar se o endereço foi encontrado
+        if 'erro' in endereco_info:
+            print("Endereço não encontrado. Insira os dados manualmente.")
+            endereco[0] = input("CEP: ")
+            if not endereco[0]:
+                endereco[0] = "Não informado"
+            endereco[1] = input("Logradouro: ")
+            if not endereco[1]:
+                endereco[1] = "Não informado"
+            endereco[2] = input("Bairro: ")
+            if not endereco[2]:
+                endereco[2] = "Não informado"
+            endereco[3] = input("Cidade: ")
+            if not endereco[3]:
+                endereco[3] = "Não informado"
+            endereco[4] = input("Estado: ")
+            if not endereco[4]:
+                endereco[4] = "Não informado"
+        else:
+            # Atualizar a lista de endereço com as informações disponíveis
+            endereco[0] = endereco_info.get('cep', 'CEP não encontrado')
+            endereco[1] = endereco_info.get('logradouro', 'Logradouro não encontrado')
+            endereco[2] = endereco_info.get('bairro', 'Bairro não encontrado')
+            endereco[3] = endereco_info.get('localidade', 'Cidade não encontrada')
+            endereco[4] = endereco_info.get('uf', 'Estado não encontrado')
 
         return endereco
     except requests.exceptions.HTTPError as err:

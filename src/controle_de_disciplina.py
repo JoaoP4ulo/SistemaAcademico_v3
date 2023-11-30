@@ -96,16 +96,16 @@ def cadastrar_disciplina(disciplina_dao): #feito
     print('\n\n  Disciplina cadastrada com sucesso!')
 
 
-def atualizar_disciplina(disciplina_dao): #feito
+def atualizar_disciplina(disciplina_dao):
     codigo = str(input("    Codigo:"))
     disciplina_existente = disciplina_dao.buscar_disciplina(codigo)
 
     if disciplina_existente is None:
-        print('\n    Codigo não existente!')
+        print('\n    Disciplina não encontrada!')
         codigo = str(input("    Codigo:"))
         disciplina_existente = disciplina_dao.buscar_disciplina(codigo)
         if disciplina_existente is None:
-            print('\n    Codigo não existente!')
+            print('\n    Disciplina não encontrada!')
             MenuDisciplina(disciplina_dao.db_path)
 
     print(f"""\n
@@ -116,19 +116,13 @@ def atualizar_disciplina(disciplina_dao): #feito
         Professor responsavel: {disciplina_existente.nome_professor}\n
     """)
 
-    nome_new = str(input("\n    Novo nome da disciplina:"))
-    carga_h_new = str(input("\n    Nova carga horária da disciplina:"))
-    nome_professor_new = str(input("\n    Novo professor responsável:"))
+    new_nome = str(input("\n    Novo nome da disciplina:"))
+    new_carga_h = str(input("\n    Nova carga horária da disciplina:"))
+    new_nome_professor = str(input("\n    Novo professor responsável:"))
 
-    if nome_new:
-        disciplina_dao.atualizar_nome(disciplina_existente, nome_new)
-
-    if carga_h_new:
-        disciplina_dao.atualizar_carga_h(disciplina_existente, carga_h_new)
-
-    if nome_professor_new:
-        disciplina_dao.atualizar_nome_professor(disciplina_existente, nome_professor_new)
-
+    disciplina_dao.atualizar_disciplina(disciplina_existente, new_nome, new_carga_h, new_nome_professor)
+    print("Disciplina atualizada com sucesso!")
+    
         
 def deletar_disciplina(disciplina_dao): #feito
 

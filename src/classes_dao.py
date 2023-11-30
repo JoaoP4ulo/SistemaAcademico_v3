@@ -50,46 +50,35 @@ class DisciplinaDAO():
 
         conexao.close()
 
-    def atualizar_nome(self, disciplina, new):
-        conexao = sqlite3.Connection(self.db_path)
+    def atualizar_disciplina(self, disciplina_existente, new_nome=None, new_carga_h=None, new_nome_professor=None):
+        conexao = sqlite3.connect(self.db_path)
         cursor = conexao.cursor()
 
-        comando_sql = """
-        UPDATE Disciplina SET nome = ? WHERE codigo = ?
-        """
-        
-        cursor.execute(comando_sql, (new, disciplina.codigo))
+        # Construir a parte da query que será dinâmica com base nos parâmetros fornecidos
+        query_partes = []
+        valores = []
+
+        if new_nome is not None:
+            query_partes.append("nome = ?")
+            valores.append(new_nome)
+
+        if new_carga_h is not None:
+            query_partes.append("carga_h = ?")
+            valores.append(new_carga_h)
+
+        if new_nome_professor is not None:
+            query_partes.append("nome_professor = ?")
+            valores.append(new_nome_professor)
+
+        # Montar a query final
+        query_final = f"UPDATE Disciplina SET {', '.join(query_partes)} WHERE codigo = ?"
+        valores.append(disciplina_existente.codigo)
+
+        # Executar a query
+        cursor.execute(query_final, valores)
 
         conexao.commit()
-        print("Nome da disciplina atualizado!")
-        conexao.close()
-
-    def atualizar_carga_h(self, disciplina, new):
-        conexao = sqlite3.Connection(self.db_path)
-        cursor = conexao.cursor()
-
-        comando_sql = """
-        UPDATE Disciplina SET carga_h = ? WHERE codigo = ?
-        """
-        
-        cursor.execute(comando_sql, (new, disciplina.codigo))
-
-        conexao.commit()
-        print("Carga horária da disciplina atualizada!")
-        conexao.close()
-
-    def atualizar_nome_professor(self, disciplina, new):
-        conexao = sqlite3.Connection(self.db_path)
-        cursor = conexao.cursor()
-
-        comando_sql = """
-        UPDATE Disciplina SET nome_professor = ? WHERE codigo = ?
-        """
-        
-        cursor.execute(comando_sql, (new, disciplina.codigo))
-
-        conexao.commit()
-        print("Nome do professor responsável atualizado!")
+        print("Dados da disciplina atualizados!")
         conexao.close()
 
     def excluir_disciplina(self, disciplina_existente):
@@ -107,8 +96,6 @@ class DisciplinaDAO():
         conexao.commit()
 
         conexao.close()
-
-    
 
     def listar_disciplinas(self):
         conexao = sqlite3.connect(self.db_path)
@@ -140,8 +127,6 @@ class DisciplinaDAO():
 
             if exportar_csv == 's':
                 self.exportar_para_csv(disciplinas)
-
-            
 
     def exportar_para_csv(self, disciplinas):
         nome_arquivo = input("Digite o nome do arquivo CSV (ou pressione Enter para o padrão 'disciplinas.csv'): ").strip()
@@ -210,66 +195,87 @@ class AlunoDAO():
 
         conexao.close()
 
-    def excluir_disciplina(self, disciplina_existente):
-
-        conexao = sqlite3.connect(self.db_path)
-
-        cursor = conexao.cursor()
-
-        comando_sql_nome = """
-            DELETE FROM Disciplina WHERE codigo = ?
-            """
-        
-        cursor.execute(comando_sql_nome, (disciplina_existente.codigo,))
-
-        conexao.commit()
-
-        conexao.close()
-
-    
-
-    def listar_disciplinas(self):
+    def atualizar_aluno(self, aluno_existente):
         conexao = sqlite3.connect(self.db_path)
         cursor = conexao.cursor()
 
         comando_sql = """
-        SELECT * FROM Disciplina
+        UPDATE Aluno SET nome = ?, idade = ?, email = ?, endereco = ? WHERE cpf = ?
         """
+        
+        lista_serializada = json.dumps(aluno_existente.endereco)
 
-        cursor.execute(comando_sql)
-        disciplinas = cursor.fetchall()
+        cursor.execute(comando_sql, (aluno_existente.nome, aluno_existente.idade,
+                                     aluno_existente.email, lista_serializada, aluno_existente.cpf))
+
+        conexao.commit()
+        print("Dados do aluno atualizados!")
+        conexao.close()
+
+    def excluir_aluno(self, aluno_existente):
+        conexao = sqlite3.connect(self.db_path)
+        cursor = conexao.cursor()
+
+        comando_sql_cpf = """
+            DELETE FROM Aluno WHERE cpf = ?
+        """
+        
+        cursor.execute(comando_sql_cpf, (aluno_existente.cpf,))
+
+        conexao.commit()
+        print("Aluno excluído com sucesso!")
 
         conexao.close()
 
-        if not disciplinas:
-            print("Não há disciplinas cadastradas.")
-        else:
-            print("\nLista de Disciplinas:")
-            print("Total de disciplinas cadastradas:", len(disciplinas))
+    def listar_alunos(self):
+        conexao = sqlite3.connect(self.db_path)
+        cursor = conexao.cursor()
 
-            for disciplina in disciplinas:
-                codigo, nome, carga_h, nome_professor = disciplina
-                print("\nCódigo:", codigo)
+        comando_sql = """
+        SELECT * FROM Aluno
+        """
+
+        cursor.execute(comando_sql)
+        alunos = cursor.fetchall()
+
+        conexao.close()
+
+        if not alunos:
+            print("Não há alunos cadastrados.")
+        else:
+            print("\nLista de Alunos:")
+            print("Total de alunos cadastrados:", len(alunos))
+
+            for aluno in alunos:
+                cpf, nome, idade, email, endereco_serializado = aluno
+                endereco = json.loads(endereco_serializado)
+                print("\nCPF:", cpf)
                 print("Nome:", nome)
-                print("Carga Horária:", carga_h)
-                print("Professor Responsável:", nome_professor)
+                print("Idade:", idade)
+                print("Email:", email)
+                print("Endereço:", endereco)
 
             exportar_csv = input("\nDeseja exportar os dados para um arquivo CSV? (S/N): ").lower()
 
             if exportar_csv == 's':
-                self.exportar_para_csv(disciplinas)
+                self.exportar_para_csv(alunos)
 
-    def exportar_para_csv(self, disciplinas):
-        nome_arquivo = input("Digite o nome do arquivo CSV (ou pressione Enter para o padrão 'disciplinas.csv'): ").strip()
+    # ... (seu código existente)
+
+    def exportar_para_csv(self, alunos):
+        nome_arquivo = input("Digite o nome do arquivo CSV (ou pressione Enter para o padrão 'alunos.csv'): ").strip()
 
         if not nome_arquivo:
-            nome_arquivo = 'disciplinas.csv'
+            nome_arquivo = 'alunos.csv'
 
         with open(nome_arquivo, 'w', newline='', encoding='utf-8') as arquivo_csv:
             escritor_csv = csv.writer(arquivo_csv, delimiter=';')
             # Escreve o cabeçalho
-            escritor_csv.writerow(['Código', 'Nome', 'Carga Horária', 'Professor Responsável'])
-            # Escreve os dados das disciplinas
-            escritor_csv.writerows(disciplinas)
+            escritor_csv.writerow(['CPF', 'Nome', 'Idade', 'Email', 'Endereço'])
+            # Escreve os dados dos alunos
+            for aluno in alunos:
+                cpf, nome, idade, email, endereco_serializado = aluno
+                endereco = json.loads(endereco_serializado)
+                escritor_csv.writerow([cpf, nome, idade, email, ', '.join(endereco)])
 
         print(f"Dados exportados para o arquivo CSV: {nome_arquivo}")
