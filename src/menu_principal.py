@@ -1,5 +1,6 @@
 # from src.controle_de_alunos import MenuAluno
 from src.controle_de_disciplina import MenuDisciplina
+from src.controle_de_alunos import MenuAluno
 # from src.controle_de_matricula import MenuMatricula
 
 
@@ -21,7 +22,7 @@ def MenuPrincipal():
         if comando == "1":
             MenuDisciplina()
         elif comando == "2":
-            None
+            MenuAluno()
         elif comando == "3":
             None
         elif comando == "4":

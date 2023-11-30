@@ -10,10 +10,10 @@ def MenuAluno():
     while True:
         print("""
             ---------------- Controle de Disciplinas ----------------
-            \n  1 – Cadastrar Nova Disciplina
-            \n  2 – Atualizar Disciplina
-            \n  3 – Remover Disciplina
-            \n  4 – Listar Disciplinas
+            \n  1 – Cadastrar Novo Aluno
+            \n  2 – Atualizar Matricula
+            \n  3 – Remover Aluno
+            \n  4 – Listar Alunos
             \n  5 – Voltar Menu Principal
         """)
         
@@ -95,15 +95,29 @@ def cadastrar_aluno(aluno_dao):
             print(" Erro no cadastro!:")
             MenuAluno()
         
-    endereco = str(input("  Insira o CEP:"))
-    utils.conferir_cep(endereco)
+    cep = str(input("  Insira o CEP:"))
+
+    endereco_lista = []
+
+    try:
+        endereco = utils.conferir_cep(cep)
+    except:
+        print("Não foi possível encontrar informações do CEP")
+        rua = str(input(" Logradouro (Rua): "))
+        bairro = str(input(" Bairro: "))
+        cidade = str(input(" Cidade: "))
+        estado = str(input(" Estado: "))
+
+        endereco_lista.append(cep, rua, bairro, cidade, estado)
+
         
 
     aluno = Aluno(cpf, nome, idade, email, endereco)
 
-    disciplina_dao.cadastrar_disciplina(disciplina)
+    aluno_dao.cadastrar_aluno(aluno)
 
-    print('\n\n  Disciplina cadastrada com sucesso!')
+    print('\n\n  Aluno cadastrado com sucesso!')
+
 
 def atualizar_aluno(aluno_dao):
     pass
