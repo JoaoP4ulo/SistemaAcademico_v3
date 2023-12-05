@@ -59,3 +59,26 @@ class Aluno():
         return self.endereco
     def set_endereco(self, new_endereco):
         self.endereco = new_endereco
+
+
+
+class Matricula():
+    def __init__(self, cpf, codigo, data):
+        self.cpf = cpf
+        self.codigo = codigo
+        self.data = data
+
+    def get_cpf(self):
+        return self.cpf
+    def set_cpf(self, new_cpf):
+        self.cpf = new_cpf
+
+    def get_codigo(self):
+        return self.codigo
+    def set_codigo(self, new_codigo):
+        self.codigo = new_codigo
+
+    def get_data(self):
+        return self.data
+    def set_data(self, new_data):
+        self.data = new_data

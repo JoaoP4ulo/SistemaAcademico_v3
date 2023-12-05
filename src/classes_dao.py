@@ -1,6 +1,6 @@
 from src import utils
 import sqlite3
-from src.classes_base import Disciplina, Aluno
+from src.classes_base import Disciplina, Aluno, Matricula
 import csv
 import json
 
@@ -260,7 +260,6 @@ class AlunoDAO():
             if exportar_csv == 's':
                 self.exportar_para_csv(alunos)
 
-    # ... (seu código existente)
 
     def exportar_para_csv(self, alunos):
         nome_arquivo = input("Digite o nome do arquivo CSV (ou pressione Enter para o padrão 'alunos.csv'): ").strip()
@@ -276,6 +275,90 @@ class AlunoDAO():
             for aluno in alunos:
                 cpf, nome, idade, email, endereco_serializado = aluno
                 endereco = json.loads(endereco_serializado)
-                escritor_csv.writerow([cpf, nome, idade, email, ', '.join(endereco)])
+                escritor_csv.writerow([cpf, nome, idade, email, endereco])
+
+        print(f"Dados exportados para o arquivo CSV: {nome_arquivo}")
+
+
+class MatriculaDAO():
+    def __init__(self,db_path):
+        self.db_path = db_path
+
+    def cadastrar_matricula(self, matricula):
+        conexao = sqlite3.connect(self.db_path)
+        cursor = conexao.cursor()
+
+        comando_sql = """
+        INSERT INTO Matricula (cpf, codigo, data) 
+        VALUES (?, ?, ?)
+        """
+
+        cursor.execute(comando_sql, (matricula.cpf, matricula.codigo, matricula.data))
+
+        conexao.commit()
+        conexao.close()
+
+    def buscar_matricula(self, cpf_aluno, codigo_disciplina):
+        conexao = sqlite3.connect(self.db_path)
+        cursor = conexao.cursor()
+
+        comando_sql = """
+        SELECT * FROM Matricula WHERE cpf = ? AND codigo = ?
+        """
+
+        cursor.execute(comando_sql, (cpf_aluno, codigo_disciplina))
+        matricula_tupla = cursor.fetchone()
+
+        conexao.close()
+
+        if matricula_tupla is None:
+            return None
+
+        matricula = Matricula(cpf=matricula_tupla[0], codigo=matricula_tupla[1], data=matricula_tupla[2])
+
+        return matricula
+    
+    def cancelar_matricula(self, matricula):
+        conexao = sqlite3.connect(self.db_path)
+        cursor = conexao.cursor()
+
+        comando_sql = """
+        DELETE FROM Matricula WHERE cpf = ? AND codigo = ?
+        """
+
+        cursor.execute(comando_sql, (matricula.cpf, matricula.codigo))
+
+        conexao.commit()
+        conexao.close()
+
+    def listar_matriculas(self):
+        conexao = sqlite3.connect(self.db_path)
+        cursor = conexao.cursor()
+
+        comando_sql = """
+        SELECT * FROM Matricula
+        """
+
+        cursor.execute(comando_sql)
+        matriculas = cursor.fetchall()
+
+        conexao.close()
+
+        return matriculas
+
+
+    def exportar_matriculas_para_csv(self, matriculas):
+        nome_arquivo = input("Digite o nome do arquivo CSV (ou pressione Enter para o padrão 'matriculas.csv'): ").strip()
+
+        if not nome_arquivo:
+            nome_arquivo = 'matriculas.csv'
+
+        with open(nome_arquivo, 'w', newline='', encoding='utf-8') as arquivo_csv:
+            escritor_csv = csv.writer(arquivo_csv, delimiter=';')
+            # Escreve o cabeçalho
+            escritor_csv.writerow(['CPF do Aluno', 'Código da Disciplina', 'Data e Horário da Matrícula'])
+            # Escreve os dados das matrículas
+            for matricula in matriculas:
+                escritor_csv.writerow([matricula.cpf_aluno, matricula.codigo_disciplina, matricula.data_horario])
 
         print(f"Dados exportados para o arquivo CSV: {nome_arquivo}")

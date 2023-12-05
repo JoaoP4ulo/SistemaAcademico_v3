@@ -7,28 +7,28 @@ from src import utils
 
 
 def MenuAluno():
-    while True:
-        print("""
+    
+    print("""
             ---------------- Controle de Disciplinas ----------------
             \n  1 – Cadastrar Novo Aluno
             \n  2 – Atualizar Matricula
             \n  3 – Remover Aluno
             \n  4 – Listar Alunos
             \n  5 – Voltar Menu Principal
-        """)
+    """)
         
-        comando = str(input("\nDigite sua opção:"))
+    comando = str(input("\nDigite sua opção:"))
 
-        if comando == "1":
-            cadastrar_aluno(aluno_dao) #feito
-        elif comando == "2":
-            atualizar_aluno(aluno_dao) #feito
-        elif comando == "3":
-            deletar_aluno(aluno_dao) #feito
-        elif comando == "4":
-            listar_alunos(aluno_dao) 
-        elif comando == "5":
-            menu.MenuPrincipal()
+    if comando == "1":
+        cadastrar_aluno(aluno_dao) #feito
+    elif comando == "2":
+        atualizar_aluno(aluno_dao) #feito
+    elif comando == "3":
+        deletar_aluno(aluno_dao) #feito
+    elif comando == "4":
+        listar_alunos(aluno_dao) #feito
+    elif comando == "5":
+        menu.MenuPrincipal()
 
 def cadastrar_aluno(aluno_dao):
 
@@ -110,6 +110,7 @@ def cadastrar_aluno(aluno_dao):
     aluno_dao.cadastrar_aluno(aluno)
 
     print('\n\n  Aluno cadastrado com sucesso!')
+    MenuAluno()
 
 
 def obter_endereco_manualmente():
@@ -167,6 +168,7 @@ def atualizar_aluno(aluno_dao):
 
     aluno_dao.atualizar_aluno(aluno_existente)
     print("Aluno atualizado com sucesso!")
+    MenuAluno()
 
 
 def deletar_aluno(aluno_dao):
@@ -184,6 +186,8 @@ def deletar_aluno(aluno_dao):
     resposta = str(input(f"Deseja excluir o aluno {aluno_existente.nome}? [y/n]"))
     if resposta.lower() == 'y':
         aluno_dao.excluir_aluno(aluno_existente)
+    MenuAluno()
 
 def listar_alunos(aluno_dao):
     aluno_dao.listar_alunos()
+    MenuAluno()

@@ -6,8 +6,8 @@ from src import menu_principal as menu
 
 
 def MenuDisciplina():
-    while True:
-        print("""
+    
+    print("""
             ---------------- Controle de Disciplinas ----------------
             \n  1 – Cadastrar Nova Disciplina
             \n  2 – Atualizar Disciplina
@@ -16,18 +16,18 @@ def MenuDisciplina():
             \n  5 – Voltar Menu Principal
         """)
         
-        comando = str(input("\nDigite sua opção:"))
+    comando = str(input("\nDigite sua opção:"))
 
-        if comando == "1":
-            cadastrar_disciplina(disciplina_dao) #feito
-        elif comando == "2":
-            atualizar_disciplina(disciplina_dao) #feito
-        elif comando == "3":
-            deletar_disciplina(disciplina_dao) #feito
-        elif comando == "4":
-            listar_disciplinas(disciplina_dao) #feito
-        elif comando == "5":
-            menu.MenuPrincipal()
+    if comando == "1":
+        cadastrar_disciplina(disciplina_dao) #feito
+    elif comando == "2":
+        atualizar_disciplina(disciplina_dao) #feito
+    elif comando == "3":
+        deletar_disciplina(disciplina_dao) #feito
+    elif comando == "4":
+        listar_disciplinas(disciplina_dao) #feito
+    elif comando == "5":
+        menu.MenuPrincipal()
         
 
 def cadastrar_disciplina(disciplina_dao): #feito
@@ -94,6 +94,7 @@ def cadastrar_disciplina(disciplina_dao): #feito
     disciplina_dao.cadastrar_disciplina(disciplina)
 
     print('\n\n  Disciplina cadastrada com sucesso!')
+    MenuDisciplina()
 
 
 def atualizar_disciplina(disciplina_dao):
@@ -122,6 +123,7 @@ def atualizar_disciplina(disciplina_dao):
 
     disciplina_dao.atualizar_disciplina(disciplina_existente, new_nome, new_carga_h, new_nome_professor)
     print("Disciplina atualizada com sucesso!")
+    MenuDisciplina()
     
         
 def deletar_disciplina(disciplina_dao): #feito
@@ -141,6 +143,10 @@ def deletar_disciplina(disciplina_dao): #feito
     if resposta == 'y' or resposta =='Y':
         disciplina_dao.excluir_disciplina(disciplina_existente)
 
+    MenuDisciplina()
+
 def listar_disciplinas(disciplina_dao):
 
     disciplina_dao.listar_disciplinas()
+
+    MenuDisciplina()
